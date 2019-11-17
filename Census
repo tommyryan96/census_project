@@ -1,0 +1,57 @@
+Census1901 <- read.csv(file = "1901.csv", header = TRUE, sep = ",")
+Census1911 <- read.csv(file = "IRE1911.csv", header = TRUE, sep = ",")
+
+
+install.packages("readxl")
+library(readxl)
+OccCodes <- read_excel("HISCO.xlsx")
+
+data1901 <- Census1901[which(Census1901$ForeName == "Walter" & Census1901$Surname == "Staples" & Census1901$DED == "Maynooth"),]
+
+data1911 <- Census1911[which(Census1911$Surname == "Staples" & Census1911$DED == "Maynooth"),]
+
+Sur <- Reduce(setdiff, strsplit(c(as.character(data1901$Surname[1]), as.character(data1911$Surname[1])), split = ""))
+FOR <- Reduce(setdiff, strsplit(c(as.character(data1901$ForeName[1]), as.character(data1911$Forename[1])), split = ""))
+TS <- Reduce(setdiff, strsplit(c(as.character(data1901$Townland.Street[1]), as.character(data1911$Townland.Street[1])), split = ""))
+DED <- Reduce(setdiff, strsplit(c(as.character(data1901$DED[1]), as.character(data1911$DED[1])), split = ""))
+Cty <- Reduce(setdiff, strsplit(c(as.character(data1901$County[1]), as.character(data1911$County[1])), split = ""))
+Age <- Age <- ifelse(data1901$Age[1]==data1911$Age[1]- 10,T <- T + 1,ifelse(data1901$Age[1]!=data1911$Age[1],T <- T + 0))
+Sex <- Reduce(setdiff, strsplit(c(as.character(data1901$Sex[1]), as.character(data1911$Sex[1])), split = ""))
+BP <- Reduce(setdiff, strsplit(c(as.character(data1901$Birthplace[1]), as.character(data1911$Birthplace[1])), split = ""))
+OccupationCode1901 <- 0 
+OccupationIndex <- 0
+OccupationCode1911 <- 0
+Occupation <- 1
+while(OccupationIndex <= nrow(OccCodes))
+  {
+    EQoccupation1901 <- all.equal(as.character(data1901$Occupation[1]), as.character(OccCodes$`Source name`[OccupationIndex]), tolerance = 0)
+    if(all(EQoccupation1901 == "TRUE")) 
+      {
+        OccupationCode1901 <- OccCodes$`Hisco code`[OccupationIndex]  
+        }
+
+    EQoccupation1911 <- all.equal(as.character(data1911$Occupation[1]), as.character(OccCodes$`Source name`[OccupationIndex]), tolerance = 0)
+    if(all(EQoccupation1911 == "TRUE"))
+      {
+        OccupationCode1911 <- OccCodes$`Hisco code`[OccupationIndex]
+      }
+    OccupationIndex <- OccupationIndex + 1
+    }
+if((OccupationCode1901 - OccupationCode1911) == 0 ) Occupation <- 0 else Occupation <- 1
+                          
+                          
+                          
+Rel <- Reduce(setdiff, strsplit(c(as.character(data1901$Religion[1]), as.character(data1911$Religion[1])), split = ""))
+Lit <- Reduce(setdiff, strsplit(c(as.character(data1901$Literacy[1]), as.character(data1911$Literacy[1])), split = ""))
+IL <- Reduce(setdiff, strsplit(c(as.character(data1901$Irish.Language[1]), as.character(data1911$Irish.Language[1])), split = ""))
+RTH <- Reduce(setdiff, strsplit(c(as.character(data1901$Relation.to.Head.of.Household[1]), as.character(data1911$Relation.to.Head.of.Household[1])), split = ""))
+MS <- Reduce(setdiff, strsplit(c(as.character(data1901$Marital.Status[1]), as.character(data1911$Marital.Status[1])), split = ""))
+SI <- Reduce(setdiff, strsplit(c(as.character(data1901$Specified.Illnesses[1]), as.character(data1911$Specified.Illnesses[1])), split = ""))
+                          
+numberOfDifferences <-  length(Sur) + length(FOR) + length(TS) + length(DED) + length(Cty) + length(Sex) + length(BP) + length(Occupation) + length(Rel) + length(Lit) + length(IL) + length(RTH) + length(MS) + length(SI) 
+print(numberOfDifferences)
+lengthOfOneRow <- nchar(as.character(data1901$Specified.Illnesses[1])) + nchar(as.character(data1901$Literacy[1])) + nchar(as.character(data1901$Irish.Language[1])) + nchar(as.character(data1901$Relation.to.Head.of.Household[1])) + nchar(as.character(data1901$Marital.Status[1])) + nchar(as.character(data1901$Birthplace[1])) + nchar(as.character(data1901$Occupation[1])) + nchar(as.character(data1901$Religion[1])) + nchar(as.character(data1901$Surname[1])) + nchar(as.character(data1901$ForeName[1])) + nchar(as.character(data1901$Townland.Street[1])) + nchar(as.character(data1901$DED[1])) + nchar(as.character(data1901$County[1])) + nchar(as.character(data1901$Age[1])) + nchar(as.character(data1901$Sex[1]))
+print(lengthOfOneRow - numberOfDifferences)
+PercentMatch<- ((lengthOfOneRow - numberOfDifferences)/ lengthOfOneRow)*100
+print(PercentMatch)
+                          
